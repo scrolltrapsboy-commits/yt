@@ -1,0 +1,47 @@
+### ffmpeg-render-service - HTTP request examples
+### Use with the VS Code "REST Client" extension, or as a reference for curl/n8n.
+
+@baseUrl = http://localhost:3000
+
+### Health check
+GET {{baseUrl}}/health
+
+### Root / service info
+GET {{baseUrl}}/
+
+### Render a Short - full example with background music
+POST {{baseUrl}}/render
+Content-Type: application/json
+
+{
+  "title": "Space Facts",
+  "script": "Did you know that a day on Venus is longer than its year. Venus takes 243 Earth days to rotate once, but only 225 Earth days to orbit the Sun. Scientists believe this is caused by the planet's thick atmosphere and slow retrograde rotation.",
+  "videoUrls": [
+    "https://cdn.example.com/stock/space-1.mp4",
+    "https://cdn.example.com/stock/space-2.mp4",
+    "https://cdn.example.com/stock/space-3.mp4"
+  ],
+  "voiceUrl": "https://cdn.example.com/audio/space-facts-narration.mp3",
+  "backgroundMusic": "https://cdn.example.com/audio/ambient-space.mp3",
+  "style": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  }
+}
+
+### Render a Short - minimal example, no background music, default style
+POST {{baseUrl}}/render
+Content-Type: application/json
+
+{
+  "title": "Ocean Facts",
+  "script": "The ocean covers more than seventy percent of Earth's surface, yet we have explored less than five percent of it.",
+  "videoUrls": [
+    "https://cdn.example.com/stock/ocean-1.mp4"
+  ],
+  "voiceUrl": "https://cdn.example.com/audio/ocean-facts-narration.mp3"
+}
+
+### Fetch a previously rendered video
+GET {{baseUrl}}/output/REPLACE_WITH_JOB_ID.mp4

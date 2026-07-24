@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+
+# Runtime artifacts
+temp/*
+!temp/.gitkeep
+output/*
+!output/.gitkeep
+subtitles/*
+!subtitles/.gitkeep
+logs/*
+!logs/.gitkeep
+public/audio/*
+!public/audio/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker
+docker-data/

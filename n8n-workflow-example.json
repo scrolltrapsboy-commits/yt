@@ -1,0 +1,147 @@
+{
+  "name": "FFmpeg Render Service - Example Call",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger-1",
+      "name": "When clicking 'Execute workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "assign-title",
+              "name": "title",
+              "value": "Space Facts",
+              "type": "string"
+            },
+            {
+              "id": "assign-script",
+              "name": "script",
+              "value": "Did you know that a day on Venus is longer than its year. Venus takes two hundred forty three Earth days to rotate once, but only two hundred twenty five Earth days to orbit the Sun.",
+              "type": "string"
+            },
+            {
+              "id": "assign-video-urls",
+              "name": "videoUrls",
+              "value": "=[\"https://cdn.example.com/stock/space-1.mp4\", \"https://cdn.example.com/stock/space-2.mp4\"]",
+              "type": "array"
+            },
+            {
+              "id": "assign-voice-url",
+              "name": "voiceUrl",
+              "value": "https://cdn.example.com/audio/space-facts-narration.mp3",
+              "type": "string"
+            },
+            {
+              "id": "assign-music-url",
+              "name": "backgroundMusic",
+              "value": "https://cdn.example.com/audio/ambient-space.mp3",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-node-1",
+      "name": "Set Render Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3000/render",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"title\": \"{{ $json.title }}\",\n  \"script\": \"{{ $json.script }}\",\n  \"videoUrls\": {{ JSON.stringify($json.videoUrls) }},\n  \"voiceUrl\": \"{{ $json.voiceUrl }}\",\n  \"backgroundMusic\": \"{{ $json.backgroundMusic }}\",\n  \"style\": {\n    \"width\": 1080,\n    \"height\": 1920,\n    \"fps\": 30\n  }\n}",
+        "options": {
+          "timeout": 900000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "http-request-1",
+      "name": "Call FFmpeg Render API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300],
+      "notes": "POST http://<your-server>:3000/render . Set Timeout high (e.g. 900000ms / 15 min) since rendering can take a while for longer scripts / more clips. Response contains success, videoUrl, duration, renderTime."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-success",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-node-1",
+      "name": "Render Succeeded?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Set Render Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Render Payload": {
+      "main": [
+        [
+          {
+            "node": "Call FFmpeg Render API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call FFmpeg Render API": {
+      "main": [
+        [
+          {
+            "node": "Render Succeeded?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "meta": {
+    "description": "Example n8n workflow demonstrating how to call the ffmpeg-render-service /render endpoint. The 'Call FFmpeg Render API' node is the key piece to import into your own workflow: it sends the required JSON body and expects { success, videoUrl, duration, renderTime } back."
+  }
+}
